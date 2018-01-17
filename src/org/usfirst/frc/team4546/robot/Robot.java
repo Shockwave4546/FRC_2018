@@ -9,6 +9,7 @@
 // GFB - 1/13/18: Trying to move one motor with a joystick or a button
 // SC, HD, DP - 1/14/18: Trying to get two motors moving and using an xbox controller
 // GFB - 1/15/18: Cleaning up 1/14/18's code and trying to get camera code working
+// GFB - 1/16/18: Getting a github repository to work with the code
 
 package org.usfirst.frc.team4546.robot;
 
