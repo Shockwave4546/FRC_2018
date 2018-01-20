@@ -42,16 +42,16 @@ public class Robot extends IterativeRobot {
 	private static final String kCustomAuto = "My Auto";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
-	
 	private static final int kPDP = 0;
-	private PowerDistributionPanel m_pdp;
-	private static final int kJoystickPort = 0;
+	private PowerDistributionPanel m_PDP;
+	private static final int kJoystickPort = 2;
 	//private Joystick m_joystick;
 	private XboxController m_xboxcontroller;
 	private static final int kMotorPort = 0;
 	private SpeedController m_motorRight;
 	private static final int kMotorPort2 = 5;
 	private SpeedController m_motorLeft;
+	private boolean toggleY = false;
 	
 
 	/**
@@ -60,19 +60,19 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
-		
-		m_pdp = new PowerDistributionPanel(kPDP);
-		SmartDashboard.putData("PDP Voltage", m_pdp);
-		
+		m_PDP = new PowerDistributionPanel(kPDP);
+		SmartDashboard.putData("Voltage", m_PDP);
 		//m_joystick = new Joystick(kJoystickPort);3
 		m_xboxcontroller = new XboxController(kJoystickPort);
 		// Creates motor ports
 		m_motorRight = new Talon(kMotorPort);
 		m_motorLeft = new Talon(kMotorPort2);
 		m_motorLeft.setInverted(true);
+		
+		//boolean toggleY = false;//toggle variable for y button
+	
 		/*
 		// Creates camera and video feed
 		new Thread(() -> {
@@ -121,7 +121,10 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
+		double speed = 0;
+		m_motorLeft.set(speed);
+		m_motorRight.set(speed);
+		/*switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
 				break;
@@ -129,7 +132,7 @@ public class Robot extends IterativeRobot {
 			default:
 				// Put default auto code here
 				break;
-		}
+		}*/
 	}
 
 	/**
@@ -138,18 +141,25 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		// Setting up the joysticks on the Xbox controller
-		
-		m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
-		m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
-			
-	// use this for inputs of buttons
 		if(m_xboxcontroller.getYButtonPressed()){
-			m_motorRight.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kRight)* -1);
+			if(toggleY == false){
+				toggleY = true;
+			}else if(toggleY == true){
+				toggleY = false;
+			}
 		}
+		if(toggleY == false){
+			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
+			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
+		}else if(toggleY == true){
+			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
+			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
+		}}
+	// use this for inputs of buttons
+		//if(m_xboxcontroller.getYButtonPressed()){
 
-		
-	}
+
+
 	
 	/**
 	 * This function is called periodically during test mode.
