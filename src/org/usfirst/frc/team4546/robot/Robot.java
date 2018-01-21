@@ -13,6 +13,8 @@
 
 package org.usfirst.frc.team4546.robot;
 
+
+
 //import org.opencv.core.Mat;
 //import org.opencv.imgproc.Imgproc;
 //import edu.wpi.cscore.CvSink;
@@ -26,9 +28,11 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -52,7 +56,16 @@ public class Robot extends IterativeRobot {
 	private static final int kMotorPort2 = 5;
 	private SpeedController m_motorLeft;
 	private boolean toggleY = false;
-	
+	private double Rtrigger = 0;
+	private boolean togglegas = false;
+	/*private enum AllianceStationID{
+		Blue1,
+		Blue2,
+		Blue3,
+		Red1,
+		Red2,
+		Red3
+	}*/
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -121,10 +134,14 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		double speed = .2;
-		m_motorLeft.set(speed);
-		m_motorRight.set(speed);
-		/*switch (m_autoSelected) {
+		//figure out timer or delay command to make timed movements during auto
+		
+		//m_motorLeft.set(.1);
+		//m_motorRight.set(.1);
+		
+		
+		/*
+		switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
 				break;
@@ -140,23 +157,39 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		// Setting up the joysticks on the Xbox controller
-		if(m_xboxcontroller.getYButtonPressed()){
-			if(toggleY == false){
-				toggleY = true;
-			}else if(toggleY == true){
-				toggleY = false;
-			}
-		}
-		if(toggleY == false){
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
-			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
-		}else if(toggleY == true){
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
-			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
-		}}
-	// use this for inputs of buttons
-		//if(m_xboxcontroller.getYButtonPressed()){
+		 Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
+		 if(Rtrigger == 1);{
+		 	togglegas = true;
+		 }
+		 if(Rtrigger == 0){
+			togglegas = false;
+		 }
+		 //right trigger toggle ^
+		 
+		 if(m_xboxcontroller.getYButtonPressed()){
+			 if(toggleY == false){
+				 toggleY = true;
+			 }else if(toggleY == true){
+				 toggleY = false;
+					}
+				}
+		 //Y button toggle ^
+		 
+		 if(toggleY == false && togglegas == false){
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
+		 }else if(toggleY == true && togglegas == false){
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
+		 }else if (toggleY == false && togglegas == true){
+			 m_motorLeft.set(m_xboxcontroller.getX(Hand.kLeft)* -1);	
+			 m_motorRight.set(m_xboxcontroller.getX(Hand.kRight)* -1);
+		 }else if(toggleY == true && togglegas == true){
+			 m_motorLeft.set(m_xboxcontroller.getX(Hand.kLeft));
+			 m_motorRight.set(m_xboxcontroller.getX(Hand.kRight));
+		 }}
+		// inputs for motors from Xbox Controller ^
+		
 
 
 
