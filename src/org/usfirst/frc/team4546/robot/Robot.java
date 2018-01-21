@@ -10,6 +10,9 @@
 // SC, HD, DP - 1/14/18: Trying to get two motors moving and using an xbox controller
 // GFB - 1/15/18: Cleaning up 1/14/18's code and trying to get camera code working
 // GFB - 1/16/18: Getting a github repository to work with the code
+// DP,SC - 1/19/18: Working on inverting motors with toggle of the Y Button
+// DP,GFB,SC - 1/20/18: Finished the inverting of motors, and GFB began graphing robot voltages
+
 
 package org.usfirst.frc.team4546.robot;
 
