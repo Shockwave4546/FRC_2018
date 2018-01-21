@@ -140,7 +140,17 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		m_PDP.getVoltage();
+		SmartDashboard.putData("Voltage",m_PDP);
+		/*Gets voltage and puts the integer retrieve on the SmartDashboard*/
+		
+		
 		// Setting up the joysticks on the Xbox controller
+		if(m_xboxcontroller.getXButtonPressed()){
+			System.out.println("This is the X Button on the Xbox Controller");
+		}
+		/*test for X Button (Returns "This is the X Button on the Xbox Controller")*/
+		
 		if(m_xboxcontroller.getYButtonPressed()){
 			if(toggleY == false){
 				toggleY = true;
@@ -148,13 +158,30 @@ public class Robot extends IterativeRobot {
 				toggleY = false;
 			}
 		}
+		/*test for Y Button (Returns "This is the Y Button on the Xbox Controller")*/
+		
+		if(m_xboxcontroller.getAButtonPressed()){
+			System.out.println("This is the A Button on the Xbox Controller");
+		}
+		/*test for A Button (Returns "This is the A Button on the Xbox Controller")*/
+		
+		if(m_xboxcontroller.getBButtonPressed()){
+			System.out.println("This is the B Button on the Xbox Controller");
+		}
+		/*test for B Button (Returns "This is the B Button on the Xbox Controller")*/
+	
+		
+		
+		
+		/*            Invert Motor Direction on Y Axis                       */
 		if(toggleY == false){
 			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
 			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
 		}else if(toggleY == true){
 			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
 			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
-		}}
+		}
+	}
 	// use this for inputs of buttons
 		//if(m_xboxcontroller.getYButtonPressed()){
 
