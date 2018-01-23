@@ -58,6 +58,10 @@ public class Robot extends IterativeRobot {
 	private boolean toggleY = false;
 	private double Rtrigger = 0;
 	private boolean togglegas = false;
+	private SpeedController m_intake;
+	private static final int kIntakePort = 3;
+	private SpeedController m_intake2;
+	private static final int kIntakePort2 = 1;
 	/*private enum AllianceStationID{
 		Blue1,
 		Blue2,
@@ -83,6 +87,9 @@ public class Robot extends IterativeRobot {
 		m_motorRight = new Talon(kMotorPort);
 		m_motorLeft = new Talon(kMotorPort2);
 		m_motorLeft.setInverted(true);
+		m_intake = new Talon(kIntakePort);
+		m_intake2 = new Talon(kIntakePort2);
+		m_intake2.setInverted(true);
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
@@ -136,10 +143,23 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		//figure out timer or delay command to make timed movements during auto
 		
-		//m_motorLeft.set(.1);
-		//m_motorRight.set(.1);
-		
-		
+	/**
+	 * m_motorLeft.set(.1);
+	 * m_motorRight.set(.1);
+	 * auto forward
+	 * 
+	 * m_motorLeft.set(.1);
+	 * m_motorRight.set(-.1);
+	 * auto left spin
+	 * 
+	 * m_motorLeft.set(.1);
+	 * m_motorRight.set(-.1);
+	 * auto right spin
+	 * 
+	 * m_motorLeft.set(.1);
+	 * m_motorRight.set(-.1);
+	 * auto reverse
+	 */
 		/*
 		switch (m_autoSelected) {
 			case kCustomAuto:
@@ -176,17 +196,14 @@ public class Robot extends IterativeRobot {
 		 //Y button toggle ^
 		 
 		 if(toggleY == false && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -.5);	
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -.6);
 		 }else if(toggleY == true && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
-		 }else if (toggleY == false && togglegas == true){
-			 m_motorLeft.set(m_xboxcontroller.getX(Hand.kLeft)* -1);	
-			 m_motorRight.set(m_xboxcontroller.getX(Hand.kRight)* -1);
-		 }else if(toggleY == true && togglegas == true){
-			 m_motorLeft.set(m_xboxcontroller.getX(Hand.kLeft));
-			 m_motorRight.set(m_xboxcontroller.getX(Hand.kRight));
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*.5);
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*.6);
+		 }else if (togglegas == true){
+			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
+			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
 		 }}
 		// inputs for motors from Xbox Controller ^
 		
