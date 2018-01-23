@@ -10,9 +10,13 @@
 // SC, HD, DP - 1/14/18: Trying to get two motors moving and using an xbox controller
 // GFB - 1/15/18: Cleaning up 1/14/18's code and trying to get camera code working
 // GFB - 1/16/18: Getting a github repository to work with the code
+// SC - 1/19/20: Getting a toggle direction command working
+// GFB - 1/20/20: Trying to graph voltage from pdp in the shuffleboard
+
 
 package org.usfirst.frc.team4546.robot;
 
+//import edu.wpi.first.wpilibj.CameraServer;
 //import org.opencv.core.Mat;
 //import org.opencv.imgproc.Imgproc;
 //import edu.wpi.cscore.CvSink;
@@ -45,13 +49,18 @@ public class Robot extends IterativeRobot {
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
 	private static final int kJoystickPort = 2;
-	//private Joystick m_joystick;
 	private XboxController m_xboxcontroller;
 	private static final int kMotorPort = 0;
 	private SpeedController m_motorRight;
 	private static final int kMotorPort2 = 5;
 	private SpeedController m_motorLeft;
+	private static final int kIntakePort = 3;
+	private SpeedController m_intake;
+	private static final int kIntakePort2 = 1;
+	private SpeedController m_intake2;
 	private boolean toggleY = false;
+	private double intakeTrigger = 0;
+	private boolean toggleIntake = false;
 	
 
 	/**
@@ -62,19 +71,25 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		// creates the PDP and displays values
 		m_PDP = new PowerDistributionPanel(kPDP);
 		SmartDashboard.putData("Voltage", m_PDP);
-		//m_joystick = new Joystick(kJoystickPort);3
+		SmartDashboard.putNumber("Current", m_PDP.getVoltage());
+		// creates the xbox controller
 		m_xboxcontroller = new XboxController(kJoystickPort);
 		// Creates motor ports
 		m_motorRight = new Talon(kMotorPort);
 		m_motorLeft = new Talon(kMotorPort2);
 		m_motorLeft.setInverted(true);
+		m_intake = new Talon(kIntakePort);
+		m_intake2 = new Talon(kIntakePort2);
+		m_intake2.setInverted(true);
+
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
 		/*
-		// Creates camera and video feed
+		Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			camera.setResolution(640, 480);
@@ -141,26 +156,34 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		// Setting up the joysticks on the Xbox controller
+		intakeTrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
+		System.out.println(intakeTrigger);
+		if(intakeTrigger == 1);{
+			toggleIntake = true;
+		}
+		if(intakeTrigger == 0);{
+			toggleIntake = false;
+		}
+
 		if(m_xboxcontroller.getYButtonPressed()){
 			if(toggleY == false){
 				toggleY = true;
 			}else if(toggleY == true){
 				toggleY = false;
-			}
-		}
-		if(toggleY == false){
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
-			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
-		}else if(toggleY == true){
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
-			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight));
+			}}
+		
+		// Toggles the direction of the robot drive train
+		if(toggleY == false && toggleIntake == false){
+			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -0.5);	
+			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -0.6);
+		}else if(toggleY == true && toggleIntake == false){
+			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* 0.5);
+			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* 0.6);
+		}else if(toggleIntake == true){
+			m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
+			m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
 		}}
-	// use this for inputs of buttons
-		//if(m_xboxcontroller.getYButtonPressed()){
-
-
-
-	
+			
 	/**
 	 * This function is called periodically during test mode.
 	 */
