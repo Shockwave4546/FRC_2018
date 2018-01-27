@@ -10,11 +10,13 @@
 // SC, HD, DP - 1/14/18: Trying to get two motors moving and using an xbox controller
 // GFB - 1/15/18: Cleaning up 1/14/18's code and trying to get camera code working
 // GFB - 1/16/18: Getting a github repository to work with the code
+// Everyone - 1/17/18 -- 1/23/18: Working on minor things and getting people caught up
 
 package org.usfirst.frc.team4546.robot;
 
 
 
+import edu.wpi.first.wpilibj.DigitalInput;
 //import org.opencv.core.Mat;
 //import org.opencv.imgproc.Imgproc;
 //import edu.wpi.cscore.CvSink;
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,6 +44,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.properties file in the
  * project.
  */
+
+
 public class Robot extends IterativeRobot {
 	//private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
@@ -62,6 +67,20 @@ public class Robot extends IterativeRobot {
 	private static final int kIntakePort = 3;
 	private SpeedController m_intake2;
 	private static final int kIntakePort2 = 1;
+	
+	DigitalInput limitSwitch;
+	
+	public int x = 0;
+	
+	public Timer m_timer;
+	
+	
+	
+	
+	
+	
+	
+	
 	/*private enum AllianceStationID{
 		Blue1,
 		Blue2,
@@ -89,7 +108,11 @@ public class Robot extends IterativeRobot {
 		m_motorLeft.setInverted(true);
 		m_intake = new Talon(kIntakePort);
 		m_intake2 = new Talon(kIntakePort2);
-		m_intake2.setInverted(true);
+		
+		limitSwitch = new DigitalInput(0);
+		
+		m_timer = new Timer();
+		
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
@@ -143,23 +166,14 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		//figure out timer or delay command to make timed movements during auto
 		
-	/**
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(.1);
-	 * auto forward
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto left spin
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto right spin
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto reverse
-	 */
+		
+		
+		
+		
+		
+		
+		
+		
 		/*
 		switch (m_autoSelected) {
 			case kCustomAuto:
@@ -195,22 +209,36 @@ public class Robot extends IterativeRobot {
 				}
 		 //Y button toggle ^
 		 
-		 if(toggleY == false && togglegas == false){
+		 if(toggleY == false){
 			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -.5);	
 			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -.6);
-		 }else if(toggleY == true && togglegas == false){
+		 }else if(toggleY == true){
 			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*.5);
 			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*.6);
-		 }else if (togglegas == true){
+		 }
+		 if (togglegas == true){
 			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
 			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
-		 }}
+		 }
 		// inputs for motors from Xbox Controller ^
 		
-
-
-
+		 
+		 
+		while(limitSwitch.get()){
+			x = x + 1;
+			System.out.println(x);
+			m_motorRight.set(0);
+			m_motorLeft.set(0);
+			Timer.delay(0.5);
+		}
+		
 	
+	
+	}
+//:)
+		
+		
+		
 	/**
 	 * This function is called periodically during test mode.
 	 */
