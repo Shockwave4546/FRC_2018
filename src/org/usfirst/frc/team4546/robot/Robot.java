@@ -15,14 +15,12 @@ package org.usfirst.frc.team4546.robot;
 
 
 
-//import org.opencv.core.Mat;
-//import org.opencv.imgproc.Imgproc;
-//import edu.wpi.cscore.CvSink;
-//import edu.wpi.cscore.CvSource;
-//import edu.wpi.cscore.UsbCamera;
-//import edu.wpi.first.wpilibj.CameraServer;
-//import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -46,32 +44,35 @@ public class Robot extends IterativeRobot {
 	private static final String kCustomAuto = "My Auto";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
+	
 	private static final int kJoystickPort = 2;
-	//private Joystick m_joystick;
 	private XboxController m_xboxcontroller;
+	
 	private static final int kMotorPort = 0;
-	private SpeedController m_motorRight;
+	private SpeedController m_motorFRight;
 	private static final int kMotorPort2 = 5;
-	private SpeedController m_motorLeft;
-	private boolean toggleY = false;
-	private double Rtrigger = 0;
-	private boolean togglegas = false;
+	private SpeedController m_motorFLeft;
+	//Two motor drive
+	
+	private static final int kMotorPort3 = 2;
+	private SpeedController m_motorBRight;
+	private static final int kMotorPort4 = 4;
+	private SpeedController m_motorBLeft;
+	//extra motors for 4 wheel drive
+	
 	private SpeedController m_intake;
 	private static final int kIntakePort = 3;
 	private SpeedController m_intake2;
 	private static final int kIntakePort2 = 1;
-	private Timer m_timer;
-	/*private enum AllianceStationID{
-		Blue1,
-		Blue2,
-		Blue3,
-		Red1,
-		Red2,
-		Red3
-	}*/
-
+	//intake motors
+	
+	private boolean toggleY = false;
+	private boolean togglegas = false;
+	private double Rtrigger = 0;
+	private boolean driveChange = false;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -80,22 +81,23 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		
 		m_PDP = new PowerDistributionPanel(kPDP);
 		SmartDashboard.putData("Voltage", m_PDP);
-		//m_joystick = new Joystick(kJoystickPort);3
 		m_xboxcontroller = new XboxController(kJoystickPort);
-		// Creates motor ports
-		m_motorRight = new Talon(kMotorPort);
-		m_motorLeft = new Talon(kMotorPort2);
-		m_motorLeft.setInverted(true);
+		
+		m_motorFRight = new Talon(kMotorPort);
+		m_motorFLeft = new Talon(kMotorPort2);
+		m_motorBRight = new Talon(kMotorPort3);
+		m_motorBLeft = new Talon(kMotorPort4);
+		m_motorFLeft.setInverted(true);
+		m_motorBLeft.setInverted(true);
+		//motors
 		m_intake = new Talon(kIntakePort);
 		m_intake2 = new Talon(kIntakePort2);
 		m_intake2.setInverted(true);
-		m_timer = new Timer();
+		//intake motors
 		
-		//boolean toggleY = false;//toggle variable for y button
-	
-		/*
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -114,7 +116,7 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
-		*/
+		
 		
 		
 	}
@@ -143,35 +145,20 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		m_motorLeft.set(.2);
-		m_motorRight.set(.2);
-		Timer.delay(5);
-		m_motorLeft.set(.2);
-		m_motorRight.set(-.2);
-		Timer.delay(5);
-		m_motorLeft.set(0);
-		m_motorRight.set(0);
-		Timer.delay(5);
+		double speed = .4;
+		if (driveChange == false){
+			m_motorFLeft.set(speed);
+			m_motorFRight.set(speed);
+			Timer.delay(3);
+			m_motorFLeft.set(speed);
+			m_motorFRight.set(-speed);
+			Timer.delay(3);
+			m_motorFLeft.set(0);
+			m_motorFRight.set(0);
+			Timer.delay(3);
 		}
-		//figure out timer or delay command to make timed movements during auto
-		
-	/**
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(.1);
-	 * auto forward
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto left spin
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto right spin
-	 * 
-	 * m_motorLeft.set(.1);
-	 * m_motorRight.set(-.1);
-	 * auto reverse
-	 */
+	}
+
 		/*
 		switch (m_autoSelected) {
 			case kCustomAuto:
@@ -183,7 +170,26 @@ public class Robot extends IterativeRobot {
 				break;
 		}*/
 	
-
+	/**
+	 * copy paste this if need 4 wheel drive 
+	 * else if (driveChange == true){
+			m_motorFLeft.set(speed);
+			m_motorFRight.set(speed);
+			m_motorBLeft.set(speed);
+			m_motorBRight.set(speed);
+			Timer.delay(3);
+			m_motorFLeft.set(speed);
+			m_motorFRight.set(-speed);
+			m_motorBLeft.set(speed);
+			m_motorBRight.set(-speed);
+			Timer.delay(3);
+			m_motorFLeft.set(0);
+			m_motorFRight.set(0);
+			m_motorBLeft.set(0);
+			m_motorBRight.set(0);
+			Timer.delay(3);
+		}
+	 */
 	/**
 	 * This function is called periodically during operator control.
 	 */
@@ -196,28 +202,46 @@ public class Robot extends IterativeRobot {
 		 if(Rtrigger == 0){
 			togglegas = false;
 		 }
-		 //right trigger toggle ^
+		 //right trigger toggle
+			 
+		 
 		 
 		 if(m_xboxcontroller.getYButtonPressed()){
 			 if(toggleY == false){
 				 toggleY = true;
 			 }else if(toggleY == true){
 				 toggleY = false;
-					}
-				}
-		 //Y button toggle ^
+			 }
+			 //Y button toggle
+		 }
 		 
-		 if(toggleY == false && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* .6);
-		 }else if(toggleY == true && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*-.6);
+		 
+		 if(toggleY == false && togglegas == false && driveChange == false){
+			 m_motorFLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
+			 m_motorFRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
+			 
+		 }else if(toggleY == true && togglegas == false && driveChange == false){
+			 m_motorFLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 m_motorFRight.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 
 		 }else if (togglegas == true){
 			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
 			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
-		 }}
-		// inputs for motors from Xbox Controller ^
+			 
+		 }else if (toggleY == false && togglegas == false && driveChange == true){
+			 m_motorFLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
+			 m_motorFRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
+			 m_motorBLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);
+			 m_motorBRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
+			 
+		 }else if (toggleY == true && togglegas == false && driveChange == true){
+			 m_motorFLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 m_motorFRight.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 m_motorBLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 m_motorBRight.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+		 }
+		 }
+		// inputs for motors from Xbox Controller
 		
 
 
