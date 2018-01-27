@@ -62,6 +62,7 @@ public class Robot extends IterativeRobot {
 	private static final int kIntakePort = 3;
 	private SpeedController m_intake2;
 	private static final int kIntakePort2 = 1;
+	private Timer m_timer;
 	/*private enum AllianceStationID{
 		Blue1,
 		Blue2,
@@ -90,6 +91,7 @@ public class Robot extends IterativeRobot {
 		m_intake = new Talon(kIntakePort);
 		m_intake2 = new Talon(kIntakePort2);
 		m_intake2.setInverted(true);
+		m_timer = new Timer();
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
@@ -141,6 +143,16 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		m_motorLeft.set(.2);
+		m_motorRight.set(.2);
+		Timer.delay(5);
+		m_motorLeft.set(.2);
+		m_motorRight.set(-.2);
+		Timer.delay(5);
+		m_motorLeft.set(0);
+		m_motorRight.set(0);
+		Timer.delay(5);
+		}
 		//figure out timer or delay command to make timed movements during auto
 		
 	/**
@@ -170,7 +182,7 @@ public class Robot extends IterativeRobot {
 				// Put default auto code here
 				break;
 		}*/
-	}
+	
 
 	/**
 	 * This function is called periodically during operator control.
@@ -196,11 +208,11 @@ public class Robot extends IterativeRobot {
 		 //Y button toggle ^
 		 
 		 if(toggleY == false && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -.5);	
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -.6);
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* .6);
 		 }else if(toggleY == true && togglegas == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*.5);
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*.6);
+			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*-.6);
 		 }else if (togglegas == true){
 			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
 			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
