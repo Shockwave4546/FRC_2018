@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -47,7 +49,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
-	private static final int kJoystickPort = 2;
+	private static final int kJoystickPort = 0;
 	//private Joystick m_joystick;
 	private XboxController m_xboxcontroller;
 	private static final int kMotorPort = 0;
@@ -113,10 +115,10 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
+		//m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		//System.out.println("Auto selected: " + m_autoSelected);
 	}
 
 	/**
@@ -146,8 +148,10 @@ public class Robot extends IterativeRobot {
 		m_PDP.getVoltage();
 		SmartDashboard.putData("Voltage",m_PDP);
 		/*Gets voltage and puts the integer retrieve on the SmartDashboard*/
-		
-		
+		m_PDP.getTotalCurrent();
+		SmartDashboard.putData("Total Current",m_PDP);
+		/*Gets Total Current and puts Current of all PDP channels on SmartDashboard*/
+		 
 		// Setting up the joysticks on the Xbox controller
 		if(m_xboxcontroller.getXButtonPressed()){
 			System.out.println("This is the X Button on the Xbox Controller");
