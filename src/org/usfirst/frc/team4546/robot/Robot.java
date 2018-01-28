@@ -13,9 +13,15 @@
 // DP,SC - 1/19/18: Working on inverting motors with toggle of the Y Button
 // DP,GFB,SC - 1/20/18: Finished the inverting of motors, and GFB began graphing robot voltages
 
-
 package org.usfirst.frc.team4546.robot;
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 //import org.opencv.core.Mat;
 //import org.opencv.imgproc.Imgproc;
 //import edu.wpi.cscore.CvSink;
@@ -29,8 +35,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
+//import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+//import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -44,9 +51,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	//private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	//private static final String kCustomAuto = "My Auto";
+	//private String m_autoSelected;
+	//private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
 	private static final int kJoystickPort = 0;
@@ -57,16 +64,16 @@ public class Robot extends IterativeRobot {
 	private static final int kMotorPort2 = 5;
 	private SpeedController m_motorLeft;
 	private boolean toggleY = false;
-	
-
+	double LeftMotorValue;
+	double RightMotorValue;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addObject("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+		//m_chooser.addObject("My Auto", kCustomAuto);
+		//SmartDashboard.putData("Auto choices", m_chooser);
 		m_PDP = new PowerDistributionPanel(kPDP);
 		SmartDashboard.putData("Voltage", m_PDP);
 		//m_joystick = new Joystick(kJoystickPort);3
@@ -78,7 +85,7 @@ public class Robot extends IterativeRobot {
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
-		/*
+		
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -97,7 +104,7 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
-		*/
+		
 		
 		
 	}
@@ -114,7 +121,21 @@ public class Robot extends IterativeRobot {
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	@Override
+	
+	
 	public void autonomousInit() {
+		SmartDashboard.putBoolean("TestToggle",false);
+		SmartDashboard.putNumber("LeftMotorSlider",0);
+		SmartDashboard.putNumber("RightMotorSlider",0);
+		
+		SmartDashboard.putNumber("LeftMotorValue",0);
+		SmartDashboard.putNumber("RightMotorValue",0);
+		/*m_motorLeft.set(-0.6);
+		m_motorRight.set(-0.5);
+		Timer.delay(2);
+		m_motorLeft.set(0);
+		m_motorRight.set(0);*/
+		
 		//m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
@@ -123,12 +144,37 @@ public class Robot extends IterativeRobot {
 
 	/**
 	 * This function is called periodically during autonomous.
+	 * @return 
 	 */
+	
+	
 	@Override
+		
 	public void autonomousPeriodic() {
-		double speed = .2;
-		m_motorLeft.set(speed);
-		m_motorRight.set(speed);
+		/*boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
+		if(togglevalue == true) {
+			m_motorLeft.set(0.2);
+			m_motorRight.set(0.2);
+		}else if(togglevalue == false) {
+			m_motorLeft.set(0);
+			m_motorRight.set(0);
+		}*/
+		LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
+		RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
+		SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
+		SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
+		
+		m_motorLeft.set(LeftMotorValue);
+		m_motorRight.set(RightMotorValue);
+		//m_motorLeft.set(0.429);
+		//m_motorRight.set(0.5);
+		
+
+		
+		
+		
+		
+		
 		/*switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
@@ -139,10 +185,11 @@ public class Robot extends IterativeRobot {
 				break;
 		}*/
 	}
-
+	
 	/**
 	 * This function is called periodically during operator control.
 	 */
+	
 	@Override
 	public void teleopPeriodic() {
 		m_PDP.getVoltage();
@@ -182,7 +229,7 @@ public class Robot extends IterativeRobot {
 		
 		/*            Invert Motor Direction on Y Axis                       */
 		if(toggleY == false){
-			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);	
+			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -1);
 			m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -1);
 		}else if(toggleY == true){
 			m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft));
