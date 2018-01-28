@@ -13,13 +13,12 @@
 
 package org.usfirst.frc.team4546.robot;
 
-
-
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -30,7 +29,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -69,14 +67,20 @@ public class Robot extends IterativeRobot {
 	private static final int kIntakePort2 = 1;
 	//intake motors
 	
-	private boolean toggleY = false;
-	private boolean togglegas = false;
-	private double Rtrigger = 0;
+	//private boolean toggleY = false;
+	//private boolean togglegas = false;
+	//private double Rtrigger = 0;
 	private boolean driveChange = false;
+	private AnalogInput ai;
+	double speed1 = .429;
+	double speed11 = .4;
+	double speed2 = .5;
+	double speed22 = .4;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+	
 	@Override
 	public void robotInit() {
 		m_chooser.addObject("My Auto", kCustomAuto);
@@ -86,25 +90,27 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putData("Voltage", m_PDP);
 		m_xboxcontroller = new XboxController(kJoystickPort);
 		
-		m_motorFRight = new Talon(kMotorPort);
-		m_motorFLeft = new Talon(kMotorPort2);
+		m_motorFLeft = new Talon(kMotorPort);
+		m_motorFRight = new Talon(kMotorPort2);
 		m_motorBRight = new Talon(kMotorPort3);
 		m_motorBLeft = new Talon(kMotorPort4);
-		m_motorFLeft.setInverted(true);
+		m_motorFRight.setInverted(true);
 		m_motorBLeft.setInverted(true);
 		//motors
+		
 		m_intake = new Talon(kIntakePort);
 		m_intake2 = new Talon(kIntakePort2);
 		m_intake2.setInverted(true);
 		//intake motors
+		ai = new AnalogInput(0);
 		
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-			camera.setResolution(640, 480);
+			camera.setResolution(320, 240);
 			
 			CvSink cvsink = CameraServer.getInstance().getVideo();
-			CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+			CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 320, 240);
 			
 			Mat source = new Mat();
 			Mat output = new Mat();
@@ -134,6 +140,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+
 		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
@@ -145,13 +152,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		double speed = .4;
 		if (driveChange == false){
-			m_motorFLeft.set(speed);
-			m_motorFRight.set(speed);
+			m_motorFLeft.set(speed1);
+			m_motorFRight.set(speed2);
 			Timer.delay(3);
-			m_motorFLeft.set(speed);
-			m_motorFRight.set(-speed);
+			m_motorFLeft.set(speed1);
+			m_motorFRight.set(speed22);
 			Timer.delay(3);
 			m_motorFLeft.set(0);
 			m_motorFRight.set(0);
@@ -195,16 +201,54 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		 Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
-		 if(Rtrigger == 1);{
-		 	togglegas = true;
-		 }
-		 if(Rtrigger == 0){
+		ai.getAverageBits(); 
+		ai.getVoltage();
+		if(m_xboxcontroller.getX(Hand.kLeft)<= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != -1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6 + m_xboxcontroller.getX(Hand.kLeft)*-.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)>= .1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != 1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6 + m_xboxcontroller.getX(Hand.kLeft)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)<= .1 && m_xboxcontroller.getX(Hand.kLeft)>= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.3 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.3 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-.6);
+		}else if(m_xboxcontroller.getTriggerAxis(Hand.kRight)< .1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)< .1){
+			m_motorFLeft.set(0);	
+			m_motorFRight.set(0);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)<= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != -1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6 + m_xboxcontroller.getX(Hand.kLeft)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)>= .1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != 1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6 + m_xboxcontroller.getX(Hand.kLeft)*-.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)<= .1 && m_xboxcontroller.getX(Hand.kLeft)>= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*.6);
+		}else if(m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*.6);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+		}
+		/**
+		Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
+		if(Rtrigger == 1);{
+			togglegas = true;
+		}
+		if(Rtrigger == 0){
 			togglegas = false;
-		 }
+		}
+		
 		 //right trigger toggle
-			 
 		 
+		
 		 
 		 if(m_xboxcontroller.getYButtonPressed()){
 			 if(toggleY == false){
@@ -239,7 +283,7 @@ public class Robot extends IterativeRobot {
 			 m_motorFRight.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
 			 m_motorBLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
 			 m_motorBRight.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-		 }
+		 }*/
 		 }
 		// inputs for motors from Xbox Controller
 		
