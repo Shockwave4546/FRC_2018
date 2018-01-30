@@ -11,39 +11,30 @@
 // GFB - 1/15/18: Cleaning up 1/14/18's code and trying to get camera code working
 // GFB - 1/16/18: Getting a github repository to work with the code
 // Everyone - 1/17/18 -- 1/23/18: Working on minor things and getting people caught up
+// Everyone - 1/24/18--1/27/18: Working on getting the code cleaned up and set up better for final robot instead of the test robot
 
 package org.usfirst.frc.team4546.robot;
 
 
 
 import edu.wpi.first.wpilibj.DigitalInput;
-//import org.opencv.core.Mat;
-//import org.opencv.imgproc.Imgproc;
-//import edu.wpi.cscore.CvSink;
-//import edu.wpi.cscore.CvSource;
-//import edu.wpi.cscore.UsbCamera;
-//import edu.wpi.first.wpilibj.CameraServer;
-//import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
-//import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.properties file in the
- * project.
- */
 
 
 public class Robot extends IterativeRobot {
@@ -51,72 +42,75 @@ public class Robot extends IterativeRobot {
 	private static final String kCustomAuto = "My Auto";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
+	
 	private static final int kJoystickPort = 2;
-	//private Joystick m_joystick;
 	private XboxController m_xboxcontroller;
+	
 	private static final int kMotorPort = 0;
-	private SpeedController m_motorRight;
-	private static final int kMotorPort2 = 5;
-	private SpeedController m_motorLeft;
-	private boolean toggleY = false;
-	private double Rtrigger = 0;
-	private boolean togglegas = false;
-	private SpeedController m_intake;
-	private static final int kIntakePort = 3;
-	private SpeedController m_intake2;
+	private SpeedController m_motorTopRight;
 	private static final int kIntakePort2 = 1;
+	private SpeedController m_intake2;
+	private static final int kMotorPort3 = 2;
+	private SpeedController m_motorBottomRight;
+	private static final int kIntakePort = 3;
+	private SpeedController m_intake;
+	private static final int kMotorPort4 = 4;
+	private SpeedController m_motorBottomLeft;
+	private static final int kMotorPort2 = 5;
+	private SpeedController m_motorTopLeft;
+	private static final int kArmMotor = 6;
+	private SpeedController m_arm;
+	
+	
+	
+	private boolean toggleY = false;
+	
+	private double Rtrigger = 0;
+	
+	private boolean togglegas = false;
+	
 	
 	DigitalInput limitSwitch;
 	
 	public int x = 0;
 	
-	public Timer m_timer;
+	public AnalogInput ai;	
 	
-	
-	
-	
-	
-	
-	
-	
-	/*private enum AllianceStationID{
-		Blue1,
-		Blue2,
-		Blue3,
-		Red1,
-		Red2,
-		Red3
-	}*/
-
-	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
-	 */
 	@Override
 	public void robotInit() {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		
 		m_PDP = new PowerDistributionPanel(kPDP);
 		SmartDashboard.putData("Voltage", m_PDP);
-		//m_joystick = new Joystick(kJoystickPort);3
+		
 		m_xboxcontroller = new XboxController(kJoystickPort);
+		
 		// Creates motor ports
-		m_motorRight = new Talon(kMotorPort);
-		m_motorLeft = new Talon(kMotorPort2);
-		m_motorLeft.setInverted(true);
+		m_motorTopRight = new Talon(kMotorPort);
+		m_motorBottomRight = new Talon(kMotorPort3);
+		m_motorTopLeft = new Talon(kMotorPort2);
+		m_motorTopLeft.setInverted(true);
+		m_motorBottomLeft = new Talon(kMotorPort4);
+		m_motorBottomLeft.setInverted(true);
+		m_arm = new Talon(kArmMotor);
+		
+		
 		m_intake = new Talon(kIntakePort);
 		m_intake2 = new Talon(kIntakePort2);
 		
 		limitSwitch = new DigitalInput(0);
 		
-		m_timer = new Timer();
+		ai = new AnalogInput(0);
+
 		
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
-		/*
+		
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -135,22 +129,12 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
-		*/
+		
 		
 		
 	}
 
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * <p>You can add additional auto modes by adding additional comparisons to
-	 * the switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
+
 	@Override
 	public void autonomousInit() {
 		m_autoSelected = m_chooser.getSelected();
@@ -166,14 +150,13 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		//figure out timer or delay command to make timed movements during auto
 		
+		m_motorTopRight.set(0.3);
 		
+		Timer.delay(1);
 		
+		m_motorTopRight.set(-0.3);
 		
-		
-		
-		
-		
-		
+		Timer.delay(1);
 		/*
 		switch (m_autoSelected) {
 			case kCustomAuto:
@@ -191,6 +174,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		//right trigger toggle gas
 		 Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
 		 if(Rtrigger == 1);{
 		 	togglegas = true;
@@ -198,8 +182,7 @@ public class Robot extends IterativeRobot {
 		 if(Rtrigger == 0){
 			togglegas = false;
 		 }
-		 //right trigger toggle ^
-		 
+		 //Y button toggle direction and xbox controller inputs
 		 if(m_xboxcontroller.getYButtonPressed()){
 			 if(toggleY == false){
 				 toggleY = true;
@@ -207,29 +190,40 @@ public class Robot extends IterativeRobot {
 				 toggleY = false;
 					}
 				}
-		 //Y button toggle ^
 		 
 		 if(toggleY == false){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)* -.5);	
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)* -.6);
+			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
+			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
+			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
+			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
 		 }else if(toggleY == true){
-			 m_motorLeft.set(m_xboxcontroller.getY(Hand.kLeft)*.5);
-			 m_motorRight.set(m_xboxcontroller.getY(Hand.kRight)*.6);
+			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
 		 }
 		 if (togglegas == true){
-			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft));	
-			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight));
+			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft)*1/3);	
+			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight)*1/3);
 		 }
-		// inputs for motors from Xbox Controller ^
+		 if (togglegas == false){
+			 m_intake.set(0);
+			 m_intake2.set(0);			 
+		 }
 		
-		 
 		 
 		while(limitSwitch.get()){
 			x = x + 1;
 			System.out.println(x);
-			m_motorRight.set(0);
-			m_motorLeft.set(0);
+			m_motorTopRight.set(0); 
+			m_motorTopLeft.set(0);
+			m_motorBottomRight.set(0);
+			m_motorBottomLeft.set(0);
 			Timer.delay(0.5);
+			
+			
+			ai.getAverageBits();
+			ai.getVoltage();
 		}
 		
 	
@@ -238,10 +232,6 @@ public class Robot extends IterativeRobot {
 //:)
 		
 		
-		
-	/**
-	 * This function is called periodically during test mode.
-	 */
 	@Override
 	public void testPeriodic() {
 	}
