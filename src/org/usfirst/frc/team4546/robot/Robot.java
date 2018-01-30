@@ -16,6 +16,13 @@ package org.usfirst.frc.team4546.robot;
 
 
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 //import org.opencv.core.Mat;
 //import org.opencv.imgproc.Imgproc;
@@ -74,7 +81,9 @@ public class Robot extends IterativeRobot {
 	
 	public Timer m_timer;
 	
-	
+	double LeftMotorValue;
+	double RightMotorValue;
+
 	
 	
 	
@@ -116,7 +125,7 @@ public class Robot extends IterativeRobot {
 		
 		//boolean toggleY = false;//toggle variable for y button
 	
-		/*
+		
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -135,8 +144,40 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
-		*/
 		
+		
+		
+		//Inserts a blank textbox with true or false value (set to false first from Iterative function)
+				SmartDashboard.putBoolean("TestToggle",false);
+				
+				//Inserts blank value in for the Left & Right Slider that can be modified to look like an slider.
+				SmartDashboard.putNumber("LeftMotorSlider",0);
+				SmartDashboard.putNumber("RightMotorSlider",0);
+				
+				//Allows for the current motor value to be shown on Shuffleboard.
+				SmartDashboard.putNumber("LeftMotorValue",0);
+				SmartDashboard.putNumber("RightMotorValue",0);
+		
+
+
+
+		//Toggle Button for Boolean on ShuffleBoard
+				boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
+				if(togglevalue == true) {
+				
+						}else if(togglevalue == false) {
+							
+						}
+						
+				// Slider for the Left Motor and Right Motor (Gets value from slider)
+				LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
+				RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
+				SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
+				SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
+						
+				//Gets value from slider in previous lines and sets the motor value.
+				m_motorLeft.set(LeftMotorValue);
+				m_motorRight.set(RightMotorValue);
 		
 	}
 
