@@ -51,19 +51,18 @@ public class Robot extends IterativeRobot {
 	
 	private static final int kMotorPort = 0;
 	private SpeedController m_motorFRight;
-	private static final int kMotorPort2 = 5;
+	private static final int kMotorPort2 = 2;
 	private SpeedController m_motorFLeft;
 	//Two motor drive
 	
-	private static final int kMotorPort3 = 2;
+	private static final int kMotorPort3 = 5;
 	private SpeedController m_motorBRight;
 	private static final int kMotorPort4 = 4;
 	private SpeedController m_motorBLeft;
 	//extra motors for 4 wheel drive
 	
 	private SpeedController m_intake;
-	private static final int kIntakePort = 3;
-	private SpeedController m_intake2;
+	private static final int kIntakePort = 3;	private SpeedController m_intake2;
 	private static final int kIntakePort2 = 1;
 	//intake motors
 	
@@ -76,6 +75,9 @@ public class Robot extends IterativeRobot {
 	double speed11 = .4;
 	double speed2 = .5;
 	double speed22 = .4;
+	double LeftMotorValue;
+	double RightMotorValue;
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -123,8 +125,11 @@ public class Robot extends IterativeRobot {
 			
 		}).start();
 		
-		
-		
+		SmartDashboard.putBoolean("testToggle", false);
+		SmartDashboard.putNumber("LeftMotorSlide", 0);
+		SmartDashboard.putNumber("RightMotorSlider", 0);
+		SmartDashboard.putNumber("LeftMotorValue", 0);
+		SmartDashboard.putNumber("RightMotorValue", 0);
 	}
 
 	/**
@@ -200,32 +205,32 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during operator control.
 	 */
 	@Override
-	public void teleopPeriodic() {
-		ai.getAverageBits(); 
-		ai.getVoltage();
+	public void teleopPeriodic() {		
+		
+		
 		if(m_xboxcontroller.getX(Hand.kLeft)<= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != -1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6 + m_xboxcontroller.getX(Hand.kLeft)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)* speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed2 + m_xboxcontroller.getX(Hand.kLeft)*-speed2);
 			//if right trigger is pressed, right motor speeds up based on negative value of the left joystick X axis
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)>= .1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != 1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6 + m_xboxcontroller.getX(Hand.kLeft)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed1 + m_xboxcontroller.getX(Hand.kLeft)*speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed2);
 			//if right trigger is pressed, left motor speeds up based on positive value of the left joystick X axis
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)<= .1 && m_xboxcontroller.getX(Hand.kLeft)>= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed2);
 			//if right trigger is pressed, moves straight if left joystick X axis is between -.1 and .1
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed2);
 			//if right trigger is pressed, and X axis of left joystick is held at 1,  spins to the left
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*-speed2);
 			//if right trigger is pressed, and X axis of left joystick is held at -1,  spins to the right
 			
 		}else if(m_xboxcontroller.getTriggerAxis(Hand.kRight)< .1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)< .1){
@@ -234,30 +239,52 @@ public class Robot extends IterativeRobot {
 			//motors stop when triggers are not held down
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)<= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != -1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6 + m_xboxcontroller.getX(Hand.kLeft)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed1 + m_xboxcontroller.getX(Hand.kLeft)*speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed2);
 			//if left trigger is pressed, left motor speeds up based on negative value of the left joystick X axis
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)>= .1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getX(Hand.kLeft) != 1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6 + m_xboxcontroller.getX(Hand.kLeft)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed2 + m_xboxcontroller.getX(Hand.kLeft)*-speed2);
 			//if left trigger is pressed, right motor speeds up based on positive value of the left joystick X axis
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)<= .1 && m_xboxcontroller.getX(Hand.kLeft)>= -.1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed2);
 			//if left trigger is pressed, moves straight if left joystick X axis is between -.1 and .1
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speed2);
 			//if left trigger is pressed, and X axis of left joystick is held at 1,  spins to the left
 			
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getTriggerAxis(Hand.kLeft)>=.1 && m_xboxcontroller.getTriggerAxis(Hand.kRight)<= .1){
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*.6);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-.6);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speed1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*-speed2);
 			//if left trigger is pressed, and X axis of left joystick is held at -1,  spins to the right
-		}}
+		}
+		
+		if(ai.getValue() >= 3050){
+			m_motorFLeft.set(0.3);
+		}
+		else if(ai.getValue() <= 3000 && ai.getValue() >= 2000){
+			m_motorFLeft.set(0.1);
+		}
+		else if(ai.getValue() <= 1950){
+			m_motorFLeft.set(0);
+		}
+		boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
+		if(togglevalue == true){
+			
+		}else if(togglevalue == false){
+			
+		}
+		
+		LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider", 0);
+		RightMotorValue = SmartDashboard.getNumber("RightMotorSlider", 0);
+		SmartDashboard.putNumber("LeftMotorValue", LeftMotorValue);
+		SmartDashboard.putNumber("RightMotorValue", RightMotorValue);
+	}
 /**
 		Tank drive
 		Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
