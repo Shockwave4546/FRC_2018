@@ -135,41 +135,14 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
-
-		
-		
 		
 		//Inserts a blank textbox with true or false value (set to false first from Iterative function)
-				SmartDashboard.putBoolean("TestToggle",false);
-				
-				//Inserts blank value in for the Left & Right Slider that can be modified to look like an slider.
-				SmartDashboard.putNumber("LeftMotorSlider",0);
-				SmartDashboard.putNumber("RightMotorSlider",0);
-				
-				//Allows for the current motor value to be shown on Shuffleboard.
-				SmartDashboard.putNumber("LeftMotorValue",0);
-				SmartDashboard.putNumber("RightMotorValue",0);
+		SmartDashboard.putBoolean("TestToggle",false);
 		
-
-
-
-		//Toggle Button for Boolean on ShuffleBoard
-				boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
-				if(togglevalue == true) {
-				
-						}else if(togglevalue == false) {
-							
-						}
-						
-				// Slider for the Left Motor and Right Motor (Gets value from slider)
-				LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
-				RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
-				SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
-				SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
-						
-				//Gets value from slider in previous lines and sets the motor value.
-				m_motorTopLeft.set(LeftMotorValue);
-				m_motorTopRight.set(RightMotorValue);
+		//Inserts blank value in for the Left & Right Slider that can be modified to look like an slider.
+		SmartDashboard.putNumber("LeftMotorSlider",0);
+		SmartDashboard.putNumber("RightMotorSlider",0);
+		
 		
 	}
 
@@ -213,8 +186,29 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		//Toggle Button for Boolean on ShuffleBoard
+		boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
+		if(togglevalue == true) {
+		
+				}else if(togglevalue == false) {
+					
+				}
+		
+		
+		// Slider for the Left Motor and Right Motor (Gets value from slider)
+		LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
+		RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
+		SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
+		SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
+				
+		//Gets value from slider in previous lines and sets the motor value.
+		m_motorTopLeft.set(LeftMotorValue);
+		m_motorTopRight.set(RightMotorValue);
+		
+		
+		
 		//right trigger toggle gas
-		 Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
+		/* Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
 		 if(Rtrigger == 1);{
 		 	togglegas = true;
 		 }
@@ -228,9 +222,9 @@ public class Robot extends IterativeRobot {
 			 }else if(toggleY == true){
 				 toggleY = false;
 					}
-				}
+				}*/
 		 
-		 if(toggleY == false){
+		 /*if(toggleY == false){
 			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
 			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
 			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
@@ -248,7 +242,7 @@ public class Robot extends IterativeRobot {
 		 if (togglegas == false){
 			 m_intake.set(0);
 			 m_intake2.set(0);			 
-		 }
+		 }*/
 		
 		 
 		while(limitSwitch.get()){
