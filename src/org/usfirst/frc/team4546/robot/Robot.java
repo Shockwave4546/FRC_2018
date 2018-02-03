@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
@@ -53,18 +54,17 @@ public class Robot extends IterativeRobot {
 	private static final int kMotorPort = 0;
 	private SpeedController m_motorTopRight;
 	private static final int kIntakePort2 = 1;
-	private SpeedController m_intake2;
-	private static final int kMotorPort3 = 2;
-	private SpeedController m_motorBottomRight;
+	private PWMSpeedController m_intake2;
+	private static final int kMotorPort2 = 2;
+	private SpeedController m_motorTopLeft;
 	private static final int kIntakePort = 3;
 	private SpeedController m_intake;
 	private static final int kMotorPort4 = 4;
 	private SpeedController m_motorBottomLeft;
-	private static final int kMotorPort2 = 5;
-	private SpeedController m_motorTopLeft;
+	private static final int kMotorPort3 = 5;
+	private SpeedController m_motorBottomRight;
 	private static final int kArmMotor = 6;
 	private SpeedController m_arm;
-	
 	
 
 	private boolean toggleY = false;
@@ -106,6 +106,7 @@ public class Robot extends IterativeRobot {
 		
 		
 		m_intake = new Talon(kIntakePort);
+		m_intake.setInverted(true);
 		m_intake2 = new Talon(kIntakePort2);
 		
 		limitSwitch = new DigitalInput(0);
@@ -149,27 +150,6 @@ public class Robot extends IterativeRobot {
 				//Allows for the current motor value to be shown on Shuffleboard.
 				SmartDashboard.putNumber("LeftMotorValue",0);
 				SmartDashboard.putNumber("RightMotorValue",0);
-		
-
-
-
-		//Toggle Button for Boolean on ShuffleBoard
-				boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
-				if(togglevalue == true) {
-				
-						}else if(togglevalue == false) {
-							
-						}
-						
-				// Slider for the Left Motor and Right Motor (Gets value from slider)
-				LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
-				RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
-				SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
-				SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
-						
-				//Gets value from slider in previous lines and sets the motor value.
-				m_motorTopLeft.set(LeftMotorValue);
-				m_motorTopRight.set(RightMotorValue);
 		
 	}
 
@@ -230,26 +210,24 @@ public class Robot extends IterativeRobot {
 					}
 				}
 		 
-		 if(toggleY == false){
-			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
-			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
-			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
-			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
-		 }else if(toggleY == true){
-			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
-			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+		 if(toggleY = false){
+			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)*-1);
+			 m_motorTopRight.set(m_xboxcontroller.getX(Hand.kRight)*-1);
+		 }else if(toggleY = true){
+			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft));
+			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight));
 		 }
+		 
+		 
 		 if (togglegas == true){
-			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft)*1/3);	
+			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft)*2/3);	
 			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight)*1/3);
 		 }
 		 if (togglegas == false){
 			 m_intake.set(0);
 			 m_intake2.set(0);			 
 		 }
-		
+			
 		 
 		while(limitSwitch.get()){
 			x = x + 1;
@@ -258,14 +236,49 @@ public class Robot extends IterativeRobot {
 			m_motorTopLeft.set(0);
 			m_motorBottomRight.set(0);
 			m_motorBottomLeft.set(0);
-			Timer.delay(0.5);
+			Timer.delay(0.5);}
+
+			
+
+			/*System.out.println(m_intake2.getPosition());
+			System.out.println(m_intake2.getRaw());
+			System.out.println(m_intake2.getRawBounds());
+			
+			System.out.println(ai.getValue());
+			if(ai.getValue() > 2000){
+				m_intake2.set(0.3);
+			}
+			else if(ai.getValue() <= 2000 && ai.getValue() >= 1200){
+				m_intake2.set(0.1);
+			}
+			else if(ai.getValue() < 1200){
+				m_intake2.set(0);
+			}*/
 			
 			
-			ai.getAverageBits();
-			ai.getVoltage();
-		}
+			
+			
+			
+			/*
+			//Toggle Button for Boolean on ShuffleBoard
+			boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
+			if(togglevalue == true) {
+			
+					}else if(togglevalue == false) {
+						
+					}
+					 
+			// Slider for the Left Motor and Right Motor (Gets value from slider)
+			LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
+			RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
+			SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
+			SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
+					
+			//Gets value from slider in previous lines and sets the motor value.
+			m_motorTopLeft.set(LeftMotorValue);
+			m_motorTopRight.set(RightMotorValue);
 		
-	
+	*/
 	
 	}
 //:)
