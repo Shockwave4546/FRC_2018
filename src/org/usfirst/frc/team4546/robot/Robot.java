@@ -33,16 +33,13 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+//import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
 public class Robot extends IterativeRobot {
-	//private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	
 	
 	private static final int kPDP = 0;
 	private PowerDistributionPanel m_PDP;
@@ -52,16 +49,19 @@ public class Robot extends IterativeRobot {
 	
 	private static final int kMotorPort = 0;
 	private SpeedController m_motorTopRight;
-	private static final int kIntakePort2 = 1;
-	private SpeedController m_intake2;
-	private static final int kMotorPort3 = 2;
+	private static final int kMotorPort2 = 2;
+	private SpeedController m_motorTopLeft;
+	
+	private static final int kMotorPort3 = 5;
 	private SpeedController m_motorBottomRight;
-	private static final int kIntakePort = 3;
-	private SpeedController m_intake;
 	private static final int kMotorPort4 = 4;
 	private SpeedController m_motorBottomLeft;
-	private static final int kMotorPort2 = 5;
-	private SpeedController m_motorTopLeft;
+	
+	private static final int kIntakePort = 3;
+	private SpeedController m_intake;
+	private static final int kIntakePort2 = 1;
+	private SpeedController m_intake2;
+	
 	private static final int kArmMotor = 6;
 	private SpeedController m_arm;
 	
@@ -71,9 +71,10 @@ public class Robot extends IterativeRobot {
 	
 	private double Rtrigger = 0;
   
-	double LeftMotorValue;
-	double RightMotorValue;
-
+	double TopLeftMotorValue;
+	double TopRightMotorValue;
+	double BottomLeftMotorValue;
+	double BottomRightMotorValue;
 
 	
 	private boolean togglegas = false;
@@ -87,11 +88,9 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		m_chooser.addObject("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		m_PDP = new PowerDistributionPanel(kPDP);
-		SmartDashboard.putData("Voltage", m_PDP);
+		//SmartDashboard.putData("Voltage", m_PDP);
 		
 		m_xboxcontroller = new XboxController(kJoystickPort);
 		
@@ -120,10 +119,10 @@ public class Robot extends IterativeRobot {
 		// Creates camera and video feed
 		new Thread(() -> {
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-			camera.setResolution(640, 480);
+			camera.setResolution(320, 240);
 			
 			CvSink cvsink = CameraServer.getInstance().getVideo();
-			CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+			CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 320, 240);
 			
 			Mat source = new Mat();
 			Mat output = new Mat();
@@ -135,24 +134,39 @@ public class Robot extends IterativeRobot {
 			}
 			
 		}).start();
+
+		
+		
 		
 		//Inserts a blank textbox with true or false value (set to false first from Iterative function)
-		SmartDashboard.putBoolean("TestToggle",false);
+				SmartDashboard.putBoolean("ToggleSliderControl",true);
+				
+				//Inserts blank value in for the Left & Right Slider that can be modified to look like an slider.
+				SmartDashboard.putNumber("TopLMotorSlider",0);
+				SmartDashboard.putNumber("TopRMotorSlider",0);
+				SmartDashboard.putNumber("BottomLMotorSlider",0);
+				SmartDashboard.putNumber("BottomRMotorSlider",0);
+				
+				//Intake Motor Direction Indicator is Inserted.
+				SmartDashboard.putString("LeftIntakeDirection", "Neutral");
+				SmartDashboard.putString("RightIntakeDirection", "Neutral");
+				
+				//Drive Direction Indicator is Inserted.
+				SmartDashboard.putString("Main Direction", "Idle");
+				SmartDashboard.putString("Turning", "None");
+				
+				
 		
-		//Inserts blank value in for the Left & Right Slider that can be modified to look like an slider.
-		SmartDashboard.putNumber("LeftMotorSlider",0);
-		SmartDashboard.putNumber("RightMotorSlider",0);
-		
+
+
+
 		
 	}
 
 
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		
 	}
 
 	/**
@@ -187,28 +201,38 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		//Toggle Button for Boolean on ShuffleBoard
-		boolean togglevalue = SmartDashboard.getBoolean("TestToggle", false);
-		if(togglevalue == true) {
-		
-				}else if(togglevalue == false) {
-					
+				boolean ToggleSliderValue = SmartDashboard.getBoolean("ToggleSliderControl", true);
+				if(ToggleSliderValue == true) {
+				
+						}else if(ToggleSliderValue == false) {
+							
+						}
+				
+				
+				// Slider for the Left Motor and Right Motor (Gets value from slider)
+				TopLeftMotorValue = SmartDashboard.getNumber("TopLMotorSlider",0);
+				TopRightMotorValue = SmartDashboard.getNumber("TopRMotorSlider",0);
+				BottomLeftMotorValue = SmartDashboard.getNumber("BottomLMotorSlider",0);
+				BottomRightMotorValue = SmartDashboard.getNumber("BottomRMotorSlider",0);
+				
+				SmartDashboard.putNumber("TopLMotorValue",TopLeftMotorValue);
+				SmartDashboard.putNumber("TopRMotorValue",TopRightMotorValue);
+				SmartDashboard.putNumber("BottomLMotorValue",BottomLeftMotorValue);
+				SmartDashboard.putNumber("BottomRMotorValue",BottomRightMotorValue);
+				
+				if(ToggleSliderValue == true) {
+				//Gets value from slider in previous lines and sets the motor value.
+				m_motorTopLeft.set(TopLeftMotorValue);
+				m_motorTopRight.set(TopRightMotorValue);
+				m_motorBottomLeft.set(BottomLeftMotorValue);
+				m_motorBottomRight.set(BottomRightMotorValue);
 				}
 		
-		
-		// Slider for the Left Motor and Right Motor (Gets value from slider)
-		LeftMotorValue = SmartDashboard.getNumber("LeftMotorSlider",0);
-		RightMotorValue = SmartDashboard.getNumber("RightMotorSlider",0);
-		SmartDashboard.putNumber("LeftMotorValue",LeftMotorValue);
-		SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
-				
-		//Gets value from slider in previous lines and sets the motor value.
-		m_motorTopLeft.set(LeftMotorValue);
-		m_motorTopRight.set(RightMotorValue);
 		
 		
 		
 		//right trigger toggle gas
-		/* Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
+		 Rtrigger = (m_xboxcontroller.getTriggerAxis(Hand.kRight));
 		 if(Rtrigger == 1);{
 		 	togglegas = true;
 		 }
@@ -222,37 +246,87 @@ public class Robot extends IterativeRobot {
 			 }else if(toggleY == true){
 				 toggleY = false;
 					}
-				}*/
-		 
-		 /*if(toggleY == false){
-			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
-			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
-			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);	
-			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* .5);
-		 }else if(toggleY == true){
-			 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
-			 m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+				}
+		 if(ToggleSliderValue == false) {
+			 //Gets controller axis and posts to Shuffleboard
+			 SmartDashboard.putNumber("TopLMotorValue",m_xboxcontroller.getY(Hand.kLeft)* -1);
+			 SmartDashboard.putNumber("TopRMotorValue",m_xboxcontroller.getY(Hand.kRight)* -1);
+			 SmartDashboard.putNumber("BottomLMotorValue",m_xboxcontroller.getX(Hand.kLeft)* -1);
+			 SmartDashboard.putNumber("BottomRMotorValue",m_xboxcontroller.getX(Hand.kRight)* -1);
+				
+			 if(toggleY == false){
+				 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);
+			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .465);
+			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);
+			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* .465);
+		 	}else if(toggleY == true){
+			 	m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
+			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+		 	}
+			 
+			//Robot Movement is Displayed on Shuffleboard Indicator
+			 	if((m_xboxcontroller.getY(Hand.kLeft)*.5) < ((m_xboxcontroller.getY(Hand.kRight)*.5)- 0.2) ){
+			 		
+					SmartDashboard.putString("Turning", "Right...");
+			 	}else if((m_xboxcontroller.getY(Hand.kRight)*.5) < ((m_xboxcontroller.getY(Hand.kLeft)*.5)- 0.2) ){
+			 		SmartDashboard.putString("Turning", "Left...");
+			 	}
+			 	
+			 	if((m_xboxcontroller.getY(Hand.kLeft)*.5)>= 0 && (m_xboxcontroller.getY(Hand.kRight)*.5)>= 0) {
+			 		if(toggleY==false){
+			 			SmartDashboard.putString("Main Direction", "Backward");
+			 		}else if(toggleY==true){
+			 			SmartDashboard.putString("Main Direction", "Forward");
+			 		}
+			 	}else if((m_xboxcontroller.getY(Hand.kLeft)*.5)<= 0 && (m_xboxcontroller.getY(Hand.kRight)*.5)<= 0) {
+			 		if(toggleY==false){
+			 			SmartDashboard.putString("Main Direction", "Forward");
+			 		}else if(toggleY==true){
+			 			SmartDashboard.putString("Main Direction", "Backward");
+			 		}
+			 	}
+			 	
+			 	
+		 	if (togglegas == true){
+			 	m_intake.set(m_xboxcontroller.getX(Hand.kLeft)*-2/3);	
+			 	m_intake2.set(m_xboxcontroller.getX(Hand.kRight)*1/3);
+			 	
+			 	if((m_xboxcontroller.getX(Hand.kLeft)*-2/3)< -0.15){
+			 		SmartDashboard.putString("LeftIntakeDirection", "In");
+			 	}else if((m_xboxcontroller.getX(Hand.kLeft)*-2/3)> 0.15){
+					SmartDashboard.putString("LeftIntakeDirection", "Out");
+			 	}else if((m_xboxcontroller.getX(Hand.kLeft)*-2/3)> -0.15 && (m_xboxcontroller.getX(Hand.kLeft)*-2/3) < 0.15){
+			 		SmartDashboard.putString("LeftIntakeDirection", "Neutral");
+			 	}
+			 	//Intake Motor Direction is put on Shuffleboard
+			 	if((m_xboxcontroller.getX(Hand.kRight)*1/3)< -0.15){
+			 		SmartDashboard.putString("RightIntakeDirection", "In");
+			 	}else if((m_xboxcontroller.getX(Hand.kRight)*1/3)> 0.15){
+					SmartDashboard.putString("RightIntakeDirection", "Out");
+			 	}else if((m_xboxcontroller.getX(Hand.kRight)*1/3)> -0.15 && (m_xboxcontroller.getX(Hand.kRight)*1/3) < 0.15){
+			 		SmartDashboard.putString("RightIntakeDirection", "Neutral");
+			 	}
+			 	
+			 	
+			 	
+		 	}
+		 	if (togglegas == false){
+			 	m_intake.set(0);
+			 	m_intake2.set(0);			 
+		 	} 
 		 }
-		 if (togglegas == true){
-			 m_intake.set(m_xboxcontroller.getX(Hand.kLeft)*1/3);	
-			 m_intake2.set(m_xboxcontroller.getX(Hand.kRight)*1/3);
-		 }
-		 if (togglegas == false){
-			 m_intake.set(0);
-			 m_intake2.set(0);			 
-		 }*/
 		
 		 
-		while(limitSwitch.get()){
+		/*while(limitSwitch.get()){
 			x = x + 1;
 			System.out.println(x);
 			m_motorTopRight.set(0); 
 			m_motorTopLeft.set(0);
 			m_motorBottomRight.set(0);
 			m_motorBottomLeft.set(0);
-			Timer.delay(0.5);
+			Timer.delay(0.5);*/
 			
 			
 			ai.getAverageBits();
@@ -261,7 +335,7 @@ public class Robot extends IterativeRobot {
 		
 	
 	
-	}
+	
 //:)
 		
 		
