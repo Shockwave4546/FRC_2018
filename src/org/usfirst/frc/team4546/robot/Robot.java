@@ -62,10 +62,15 @@ public class Robot extends IterativeRobot {
 	//extra motors for 4 wheel drive
 	
 	private SpeedController m_intake;
-	private static final int kIntakePort = 3;	
+	private static final int kIntakePort = 8;	
 	private SpeedController m_intake2;
-	private static final int kIntakePort2 = 1;
+	private static final int kIntakePort2 = 9;
 	//intake motors
+	
+	private SpeedController m_arm;
+	private static final int kArmPort = 1;
+	private SpeedController m_arm2;
+	private static final int kArmPort2 = 3;
 	
 	private boolean driveChange = false;
 	private AnalogInput ai;
@@ -112,6 +117,10 @@ public class Robot extends IterativeRobot {
 		m_intake2 = new Talon(kIntakePort2);
 		m_intake2.setInverted(true);
 		//intake motors
+		
+		m_arm = new Talon(kArmPort);
+		m_arm2 = new Talon(kArmPort2);
+		m_arm2.setInverted(true);
 		
 		ai = new AnalogInput(0);
 		
@@ -216,9 +225,12 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {		
 		if(m_xboxcontroller.getBumper(Hand.kRight)== true){
-			m_intake.set(m_xboxcontroller.getX(Hand.kRight)*2/3);
-			m_intake2.set(m_xboxcontroller.getX(Hand.kLeft)*1/3);
+			//m_intake.set(m_xboxcontroller.getX(Hand.kRight)*2/3);
+			//m_intake2.set(m_xboxcontroller.getX(Hand.kLeft)*1/3);
+			m_arm.set(m_xboxcontroller.getY(Hand.kRight)*2/3);
+			m_arm2.set(m_xboxcontroller.getY(Hand.kRight)*2/3);
 		}
+		
 			//box in take motors
 		if(m_xboxcontroller.getY(Hand.kLeft)<=.1 && m_xboxcontroller.getY(Hand.kLeft)>=-.1 && m_xboxcontroller.getX(Hand.kLeft)<=.1 && m_xboxcontroller.getX(Hand.kLeft)>=-.1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Idle
@@ -227,43 +239,43 @@ public class Robot extends IterativeRobot {
 			System.out.println("idle");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== -1 && m_xboxcontroller.getX(Hand.kLeft)!= -1 && m_xboxcontroller.getX(Hand.kLeft)!= 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Forward
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF2);
 			System.out.println("forward");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== 1 && m_xboxcontroller.getX(Hand.kLeft)!= -1 && m_xboxcontroller.getX(Hand.kLeft)!= 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Back
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN2);
 			System.out.println("back");
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getY(Hand.kLeft)!= -1 && m_xboxcontroller.getY(Hand.kLeft)!= 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Spin Left
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF2);
 			System.out.println("spin left");
 		}else if(m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getY(Hand.kLeft)!= -1 && m_xboxcontroller.getY(Hand.kLeft)!= 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Spin Right
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN2);
 			System.out.println("spin right");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== -1 && m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Forward Left
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF2 + m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF2 + m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF2);
 			System.out.println("forward left");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== -1 && m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Forward Right
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF1 + m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedF2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF1 + m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedF2);
 			System.out.println("forward right");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== 1 && m_xboxcontroller.getX(Hand.kLeft)== -1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Back Left
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN2 + m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN2 + m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1);
 			System.out.println("Back left");
 		}else if(m_xboxcontroller.getY(Hand.kLeft)== 1 && m_xboxcontroller.getX(Hand.kLeft)== 1 && m_xboxcontroller.getBumper(Hand.kRight)== false){
 			//Back Right
-			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1 + m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN1);	
-			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kRight)*speedFN2);
+			m_motorFLeft.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1 + m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN1);	
+			m_motorFRight.set(m_xboxcontroller.getTriggerAxis(Hand.kLeft)*speedFN2);
 			System.out.println("Back right");
 		}
 		}
