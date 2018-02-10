@@ -75,6 +75,11 @@ public class Robot extends IterativeRobot {
 	double TopRightMotorValue;
 	double BottomLeftMotorValue;
 	double BottomRightMotorValue;
+	
+	double FrontLeftScale;
+	double FrontRightScale;
+	double BackLeftScale;
+	double BackRightScale;
 
 	
 	private boolean togglegas = false;
@@ -155,6 +160,12 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putString("Main Direction", "Idle");
 				SmartDashboard.putString("Turning", "None");
 				
+				//Inserts Scaler Modifiers for Drive Motors on Shuffleboard (Number Input)
+				SmartDashboard.putNumber("FrontL_Scale",0.5);
+				SmartDashboard.putNumber("FrontR_Scale",0.465);
+				SmartDashboard.putNumber("BackL_Scale",0.5);
+				SmartDashboard.putNumber("BackR_Scale",0.465);
+				
 				
 		
 
@@ -208,6 +219,13 @@ public class Robot extends IterativeRobot {
 							
 						}
 				
+				//Motor Scaler Slider Values are retrieved from Shuffleboard and set to variables respectively.
+				FrontLeftScale = SmartDashboard.getNumber("FrontL_Scale",0);
+				FrontRightScale = SmartDashboard.getNumber("FrontR_Scale",0);
+				BackLeftScale = SmartDashboard.getNumber("BackL_Scale",0);
+				BackRightScale = SmartDashboard.getNumber("BackR_Scale",0);
+				
+				
 				
 				// Slider for the Left Motor and Right Motor (Gets value from slider)
 				TopLeftMotorValue = SmartDashboard.getNumber("TopLMotorSlider",0);
@@ -215,17 +233,17 @@ public class Robot extends IterativeRobot {
 				BottomLeftMotorValue = SmartDashboard.getNumber("BottomLMotorSlider",0);
 				BottomRightMotorValue = SmartDashboard.getNumber("BottomRMotorSlider",0);
 				
-				SmartDashboard.putNumber("TopLMotorValue",TopLeftMotorValue);
-				SmartDashboard.putNumber("TopRMotorValue",TopRightMotorValue);
-				SmartDashboard.putNumber("BottomLMotorValue",BottomLeftMotorValue);
-				SmartDashboard.putNumber("BottomRMotorValue",BottomRightMotorValue);
+				SmartDashboard.putNumber("TopLMotorValue",TopLeftMotorValue*FrontLeftScale);
+				SmartDashboard.putNumber("TopRMotorValue",TopRightMotorValue*FrontRightScale);
+				SmartDashboard.putNumber("BottomLMotorValue",BottomLeftMotorValue*BackLeftScale);
+				SmartDashboard.putNumber("BottomRMotorValue",BottomRightMotorValue*BackRightScale);
 				
 				if(ToggleSliderValue == true) {
 				//Gets value from slider in previous lines and sets the motor value.
-				m_motorTopLeft.set(TopLeftMotorValue);
-				m_motorTopRight.set(TopRightMotorValue);
-				m_motorBottomLeft.set(BottomLeftMotorValue);
-				m_motorBottomRight.set(BottomRightMotorValue);
+				m_motorTopLeft.set(TopLeftMotorValue*FrontLeftScale);
+				m_motorTopRight.set(TopRightMotorValue*FrontRightScale);
+				m_motorBottomLeft.set(BottomLeftMotorValue*BackLeftScale);
+				m_motorBottomRight.set(BottomRightMotorValue*BackRightScale);
 				}
 		
 		
@@ -255,19 +273,19 @@ public class Robot extends IterativeRobot {
 			 SmartDashboard.putNumber("BottomRMotorValue",m_xboxcontroller.getX(Hand.kRight)* -1);
 				
 			 if(toggleY == false){
-				 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);
-			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* .465);
-			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* .5);
-			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* .465);
+				 m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kLeft)* FrontLeftScale);
+			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kRight)* FrontRightScale);
+			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kLeft)* BackLeftScale);
+			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kRight)* BackRightScale);
 		 	}else if(toggleY == true){
-			 	m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
-			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)*-.5);
-			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)*-.5);
+			 	m_motorTopLeft.set(m_xboxcontroller.getY(Hand.kRight)* FrontLeftScale);
+			 	m_motorTopRight.set(m_xboxcontroller.getY(Hand.kLeft)* FrontRightScale);
+			 	m_motorBottomLeft.set(m_xboxcontroller.getY(Hand.kRight)* BackLeftScale);
+			 	m_motorBottomRight.set(m_xboxcontroller.getY(Hand.kLeft)* BackRightScale);
 		 	}
 			 
 			//Robot Movement is Displayed on Shuffleboard Indicator
-			 	if((m_xboxcontroller.getY(Hand.kLeft)*.5) < ((m_xboxcontroller.getY(Hand.kRight)*.5)- 0.2) ){
+			 	if((m_xboxcontroller.getY(Hand.kLeft)*.5) < ((m_xboxcontroller.getY(Hand.kRight)* FrontLeftScale)- 0.2) ){
 			 		
 					SmartDashboard.putString("Turning", "Right...");
 			 	}else if((m_xboxcontroller.getY(Hand.kRight)*.5) < ((m_xboxcontroller.getY(Hand.kLeft)*.5)- 0.2) ){
