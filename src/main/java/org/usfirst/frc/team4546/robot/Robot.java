@@ -63,10 +63,6 @@ public class Robot extends IterativeRobot {
 	private static final int kMotorPort2 = 5;
 	private SpeedController m_motorTopLeft;
 	private static final int kArmMotor = 6;
-	private SpeedController m_arm;
-	
-	
-
 	private boolean toggleY = false;
 	
 	private double Rtrigger = 0;
@@ -102,7 +98,7 @@ public class Robot extends IterativeRobot {
 		m_motorTopLeft.setInverted(true);
 		m_motorBottomLeft = new Talon(kMotorPort4);
 		m_motorBottomLeft.setInverted(true);
-		m_arm = new Talon(kArmMotor);
+		new Talon(kArmMotor);
 		
 		
 		m_intake = new Talon(kIntakePort);
