@@ -25,7 +25,13 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -168,8 +174,8 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("RightMotorValue",RightMotorValue);
 						
 				//Gets value from slider in previous lines and sets the motor value.
-				m_motorTopLeft.set(LeftMotorValue);
-				m_motorTopRight.set(RightMotorValue);
+				m_motorLeft.set(LeftMotorValue);
+				m_motorRight.set(RightMotorValue);
 		
 	}
 
